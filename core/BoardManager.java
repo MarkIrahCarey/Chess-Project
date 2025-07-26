@@ -2,6 +2,9 @@ package core;
 
 import java.awt.*;
 import javax.swing.*;
+
+import objects.Piece;
+
 import java.util.HashMap;
 
 public class BoardManager {
@@ -39,7 +42,7 @@ public class BoardManager {
         for (int i = 0; i < board.length; i++){
             for (int j = 0; j < board[i].length; j++){
                 // initialize button
-                board[i][j] = new JButton("Text");
+                board[i][j] = new JButton("");
             }
         }
         
@@ -59,18 +62,25 @@ public class BoardManager {
     // fillBoard is like a reset button that just adds the pieces
     private void fillBoard(){
         // get the pieces
-        CreatePieces pieces_init = new CreatePieces();
+        CreatePieces pieceManager = new CreatePieces();
 
-        pieces = pieces_init.getPieces();
+        pieces = pieceManager.getPieces();
         
         // TODO: Create a hashmap to link names with pictures
 
+       
         for (int i = 0; i < pieces.length; i++){
             for (int j = 0; j < pieces[i].length; j++){
-                // we will change this later for a photo of the pieces
-                board[pieces[i][j].getRow()][pieces[i][j].getCol()].setText(pieces[i][j].getName());
-                board[pieces[i][j].getRow()][pieces[i][j].getCol()].setName(
-                    pieces[i][j].getName() + " " + pieces[i][j].getName());
+                String piece_name = pieces[i][j].getColor() + " " + pieces[i][j].getName();
+
+                // row checks what piece will we add into the board
+                // if i < 2, black, else white
+                int row = i < 2 ? i : (i + 4);
+
+                board[row][j].setName(piece_name);
+                board[row][j].setText(piece_name);
+                
+                pieceManager.addPieceFuctionality(pieces[i][j].getName(), board[row][j], board);
             }
         }
     }
