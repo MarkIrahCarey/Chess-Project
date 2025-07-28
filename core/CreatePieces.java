@@ -7,7 +7,7 @@ import javax.swing.JButton;
 
 import objects.Piece;
 
-public class CreatePieces implements ActionListener{
+public class CreatePieces{
     Piece pieces[][];
 
     public CreatePieces(){
@@ -31,32 +31,12 @@ public class CreatePieces implements ActionListener{
 
     }
 
-
     public Piece[][] getPieces(){
         return pieces;
     }
 
-    public void addPieceFuctionality(String name, JButton b, JButton[][] board){
-        switch (name){
-            case "Pawn":
-                b.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    // Code to execute when button is clicked
-                    System.out.println("Button was clicked!");
-                }
-            });
-            break;
-
-            default:
-            break;
-        }
-    }
-
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    public void addPieceFuctionality(Piece piece, JButton jButton, JButton[][] board) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'actionPerformed'");
+        throw new UnsupportedOperationException("Unimplemented method 'addPieceFuctionality'");
     }
 }
