@@ -30,6 +30,8 @@ public class CreatePieces{
         }
 
     }
+    
+
 
     public Piece[][] getPieces(){
         return pieces;
@@ -39,4 +41,22 @@ public class CreatePieces{
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'addPieceFuctionality'");
     }
+
+    public Piece[] getTestPieces() {
+        return new Piece[] {
+            new Piece("White", "Pawn"),
+            new Piece("White", "Rook"),
+            new Piece("White", "Knight"),
+            new Piece("White", "Bishop"),
+            new Piece("White", "Queen"),
+            new Piece("White", "King"),
+            new Piece("Black", "Pawn"),
+            new Piece("Black", "Rook"),
+            new Piece("Black", "Knight"),
+            new Piece("Black", "Bishop"),
+            new Piece("Black", "Queen"),
+            new Piece("Black", "King")
+        };
+    }
+
 }
