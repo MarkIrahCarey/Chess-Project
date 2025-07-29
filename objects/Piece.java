@@ -6,17 +6,20 @@ public class Piece {
     private int row;
     private int col;
     private boolean setFirstMove;
+    private boolean turn;
 
     public Piece(){
         color = "None";
         name = "_";
         setFirstMove = false;
+        turn = false;
     }
     
     public Piece(String color, String name){
         this.color = color;
         this.name = name;
         setFirstMove = false;
+        turn = false;
     }
 
     public String getColor(){
@@ -47,7 +50,19 @@ public class Piece {
         return col;
     }
 
+    public boolean getTurn(){
+        return turn;
+    }
+
+    public void setTurn(boolean t){
+        turn = t;
+    }
+
     public boolean hasMoved(){
         return setFirstMove;
+    }
+
+    public void setMoved(){
+        setFirstMove = true;
     }
 }

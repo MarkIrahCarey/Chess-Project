@@ -3,6 +3,8 @@ package core;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 import javax.swing.*;
 // math is for rotations, will be discussed later
 import java.math.*;
@@ -14,6 +16,9 @@ public class BoardManager {
     private static JFrame gameWindow;
     private static Piece[][] pieces;
     private ChessGUI gui;
+
+    // this is for the movement logic
+    private Piece selectedPiece = null;
 
     public BoardManager() {
         // create game window, features, and its operations
@@ -38,9 +43,34 @@ public class BoardManager {
         // fillBoard();
         fillTestBoard();
 
+        // add movement logic to that square
+        addBoardClickListeners();
+        
         // display window
         gameWindow.setVisible(true);
     }
+
+    private void addBoardClickListeners() {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                JLabel square = gui.getLabel(row, col);
+                final int r = row;
+                final int c = col;
+
+                square.addMouseListener(new MouseAdapter() {
+                    public void mouseClicked(MouseEvent e) {
+                        // If this square is highlighted and there's a selected piece, move to it
+                        if (selectedPiece != null && gui.isHighlighted(r, c)) {
+                            movePiece(selectedPiece, r, c);
+                            gui.clearHighlights();
+                            selectedPiece = null;
+                        }
+                    }
+                });
+            }
+        }
+    }
+
 
     // this is just a helper method to display the board on the console, would not be used in the future
     // We now rely on ChessGUI to generate the board
@@ -109,12 +139,20 @@ public class BoardManager {
         String name = piece.getName();
         JLabel label = gui.getLabel(p_row, p_col);
 
+        // since my logic sucks, apparenlty when we move pieces, where I set the mouse listener
+        // still holding the piece logic even if they move
+        // so we will remove all the logic, then re-add
+        for (MouseListener ml : label.getMouseListeners()) {
+            label.removeMouseListener(ml);
+        }
+
         // add a switch statement to apply logic based on the piece
         switch (name) {
             case "Pawn":
                 label.addMouseListener(new MouseAdapter() {
-                    @Override
                     public void mouseClicked(MouseEvent e) {
+                        selectedPiece = piece;
+
                         int row = piece.getRow();
                         int col = piece.getCol();
                         int dir = piece.getColor().equals("White") ? -1 : 1;
@@ -142,6 +180,8 @@ public class BoardManager {
             case "Knight":
                 label.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
+                        selectedPiece = piece;
+
                         int row = piece.getRow();
                         int col = piece.getCol();
 
@@ -179,6 +219,7 @@ public class BoardManager {
             case "Bishop":
                 label.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
+                        selectedPiece = piece;
                         pieceLogicQueenRookBishop(piece);
                     }
                 });
@@ -186,6 +227,7 @@ public class BoardManager {
             case "Rook":
                 label.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
+                        selectedPiece = piece;
                         pieceLogicQueenRookBishop(piece);
                     }
                 });
@@ -193,6 +235,7 @@ public class BoardManager {
             case "Queen":
                 label.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
+                        selectedPiece = piece;
                         pieceLogicQueenRookBishop(piece);
                     }
                 });
@@ -201,6 +244,8 @@ public class BoardManager {
             case "King":
                 label.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e){
+                        selectedPiece = piece;
+
                         int row = piece.getRow();
                         int col = piece.getCol();
                         gui.clearHighlights();
@@ -218,14 +263,66 @@ public class BoardManager {
                                 gui.highlightSquare(x, y, Color.GREEN);
                             }
                         }
+                        System.out.println("King clicked at: " + row + "," + col);
                     }
-                });
+                }); 
                 break;
 
             default:
                 break;
         }
         System.out.println("Added Functionality to " + name);
+    }
+
+    private void addMovementLogic(int row, int col){
+        if (selectedPiece != null) {
+            int destRow = row;
+            int destCol = col;
+
+            // Check if square is highlighted
+            if (gui.isHighlighted(destRow, destCol)) {
+                movePiece(selectedPiece, destRow, destCol);
+                gui.clearHighlights();
+                selectedPiece = null;
+            }
+        }
+    }
+    private void movePiece(Piece piece, int newRow, int newCol){
+        int oldRow = piece.getRow();
+        int oldCol = piece.getCol();
+
+        // update the GUI on the old square
+        gui.setSquareText(oldRow, oldCol, "");
+        gui.setSquareName(oldRow, oldCol, "");
+
+        // then swap to the new square
+        gui.setSquareText(newRow, newCol, piece.getColor() + " " + piece.getName());
+        gui.setSquareName(newRow, newCol, piece.getColor() + " " + piece.getName());
+
+        // Update piece position
+        piece.setRow(newRow);
+        piece.setCol(newCol);
+        piece.setMoved(); // for the pawn logic
+
+        // then add the new logic
+        addPieceFunctionality(piece, newRow, newCol);
+    }
+
+    // then the game logic will be in the game class, we will return the board, pieces, etc
+    public JLabel[][] getBoard(){
+        return board;
+    }
+
+    public Piece[][] getPieces(){
+        return pieces;
+    }
+
+    public JFrame getWindow(){
+        return gameWindow;
+    }
+
+    public ChessGUI getGUI(){
+        return gui;
     }
 
     // Helper method
@@ -251,18 +348,17 @@ public class BoardManager {
         int end = directions.length;
 
         switch (name){
-            case "Rook":
-                end = 4;  // Only the first 4 directions
-                break;
-            case "Bishop":
-                start = 4; // Only the last 4 directions
-                break;
-            case "Queen":
-                // Use all 8 directions
-                break;
+            case "Rook": end = 4;  // Only the first 4 directions
+            break;
+
+            case "Bishop": start = 4; // Only the last 4 directions
+            break;
+
+            case "Queen": // Use all 8 directions
+            break;
+
             default:
-                
-                return;
+            return;
         }
 
         for (int i = start; i < end; i++){

@@ -1,8 +1,7 @@
-import core.BoardManager;
+import core.Game;
 
 public class main{
     public static void main(String[] args){
-       BoardManager mainBoard = new BoardManager();
-       
+       Game game = new Game();
     }
 }

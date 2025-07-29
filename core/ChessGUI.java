@@ -5,6 +5,7 @@ import java.awt.*;
 
 public class ChessGUI {
     private JLabel[][] board;
+    private boolean[][] highlightedSquares = new boolean[8][8];
 
     public ChessGUI() {
         board = new JLabel[8][8];
@@ -34,9 +35,10 @@ public class ChessGUI {
     }
 
     public void clearHighlights() {
-        for (JLabel[] row : board) {
-            for (JLabel square : row) {
-                square.setBackground(null);
+        for (int row = 0; row < board.length; row++){
+            for (int col = 0; col < board[row].length; col++){
+                board[row][col].setBackground(null);
+                highlightedSquares[row][col] = false;
             }
         }
     }
@@ -44,7 +46,12 @@ public class ChessGUI {
     public void highlightSquare(int row, int col, Color color) {
         if (isValid(row, col)) {
             board[row][col].setBackground(color);
+            highlightedSquares[row][col] = true;
         }
+    }
+
+    public boolean isHighlighted(int row, int col) {
+        return highlightedSquares[row][col];
     }
 
     public void setSquareText(int row, int col, String text) {
